@@ -24,22 +24,31 @@ jumpButton.cursor = 'pointer';
 jumpButton.on('pointerdown', handleJump);
 
 let idleTimeout = setTimeout(rotation, 5000);
+let isJumping = false;
 
 function rotation() {
     bunny.rotation += 0.01;
-    idleTimeout = setTimeout(rotation, 16);
+    idleTimeout = setTimeout(rotation, 3);
 }
 
 function handleJump() {
     clearTimeout(idleTimeout);
-    new Tween(bunny)
-        .to({ y: "-100" }, 500)
-        .easing(Easing.Back.In)
-        .chain(new Tween(bunny)
-            .to({y: app.screen.height / 2}, 500)
-            .easing(Easing.Bounce.Out)
-            .onComplete(() => idleTimeout = setTimeout(rotation, 5000)))
-        .start();
+
+    if (!isJumping) {
+        isJumping = true;
+
+        new Tween(bunny)
+            .to({ y: "-100" }, 500)
+            .easing(Easing.Back.In)
+            .chain(new Tween(bunny)
+                .to({y: app.screen.height / 2}, 500)
+                .easing(Easing.Bounce.Out)
+                .onComplete(() => {
+                    isJumping = false;
+                    idleTimeout = setTimeout(rotation, 5000);
+                }))
+            .start();
+    }
 }
 
 function animate() {
